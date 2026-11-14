@@ -1,101 +1,118 @@
-# Warehouse Delay Analytics Summary
+# Warehouse Analytics Summary
 
-Data covers January 01, 2025 to June 30, 2026: 44,991 orders, 13.1% shipped after the carrier cutoff.
+Precomputed facts from the four warehouse tables. For anything not listed here, the assistant queries the tables directly.
 
-## Late rate by picking zone
-- A: 17.6% late (19,347 orders)
-- B: 11.1% late (14,151 orders)
-- C: 10.0% late (7,017 orders)
-- D: 4.5% late (4,476 orders)
+## At-risk orders overview
+2,000 orders flagged at risk between July 01 and November 13, 2026. Average delay probability 0.45; 302 Critical (0.60 or higher), 777 High (0.40 to 0.60), 921 Elevated (below 0.40).
 
-## Late rate by day of week
-- Monday: 19.1% late (8,969 orders)
-- Saturday: 14.7% late (7,177 orders)
-- Wednesday: 11.3% late (7,313 orders)
-- Friday: 11.0% late (7,259 orders)
-- Tuesday: 10.9% late (7,193 orders)
-- Thursday: 10.2% late (7,080 orders)
+## At-risk orders by zone
+- A: 1421 orders, average delay probability 0.46
+- B: 449 orders, average delay probability 0.42
+- C: 108 orders, average delay probability 0.39
+- D: 22 orders, average delay probability 0.39
 
-## Late rate by carrier
-- LTLX: 15.7% late (4,040 orders)
-- USPS: 14.0% late (7,218 orders)
-- UPS2D: 13.1% late (3,937 orders)
-- FDXG: 12.9% late (10,600 orders)
-- UPSG: 12.3% late (19,196 orders)
+## At-risk orders by month
+- 2026-07: 425 orders
+- 2026-08: 480 orders
+- 2026-09: 433 orders
+- 2026-10: 461 orders
+- 2026-11: 201 orders
 
-## Late rate by SLA tier
-- Priority: 13.1% late (14,266 orders)
-- Express: 13.1% late (3,937 orders)
-- Standard: 13.1% late (26,788 orders)
+## At-risk orders by day of week
+- Monday: 696 orders
+- Friday: 305 orders
+- Saturday: 301 orders
+- Thursday: 258 orders
+- Tuesday: 234 orders
+- Wednesday: 206 orders
 
-## Late rate by hours to cutoff at release
-- under 2 h: 25.9% late (1,830 orders)
-- 2 to 4 h: 13.9% late (5,740 orders)
-- over 8 h: 13.8% late (23,091 orders)
-- 4 to 8 h: 10.0% late (14,330 orders)
+## Most common risk drivers (SHAP)
+- items only in reserve locations: appears in 1276 orders (63.8%)
+- high backlog in its zone: appears in 1057 orders (52.8%)
+- high units per available picker: appears in 959 orders (47.9%)
+- items spread across several zones: appears in 514 orders (25.7%)
+- little time to carrier cutoff: appears in 481 orders (24.1%)
+- Monday staffing pattern: appears in 284 orders (14.2%)
+- large unit count: appears in 172 orders (8.6%)
+- few pickers on shift: appears in 165 orders (8.2%)
+- zone C workload: appears in 105 orders (5.2%)
 
-## Late rate by order size
-- over 30 lines: 47.3% late (1,669 orders)
-- 16 to 30 lines: 23.7% late (5,852 orders)
-- 6 to 15 lines: 13.2% late (19,606 orders)
-- 1 to 5 lines: 6.3% late (17,864 orders)
+## Most common suggested actions
+- Add 2 pickers to zone A; trigger replenishment from reserve now: 465 orders
+- Add 2 pickers to zone A; trigger replenishment from reserve now; split the shipment if the customer allows: 319 orders
+- Add 2 pickers to zone A: 178 orders
+- Add 2 pickers to zone B; trigger replenishment from reserve now: 135 orders
+- Trigger replenishment from reserve now; split the shipment if the customer allows: 121 orders
+- Move to the next pick wave now; add 2 pickers to zone A; trigger replenishment from reserve now: 102 orders
 
-## Late rate by pickers on shift at release
-- 25 or fewer pickers: 14.7% late (28,330 orders)
-- more than 35 pickers: 11.0% late (1,540 orders)
-- 26 to 35 pickers: 10.2% late (15,121 orders)
+## Shipping performance
+200 shipments, 54 delayed (27.0%), 146 on time. Average delay among delayed shipments: 2.6 days; maximum 4 days.
 
-## Late rate by month
-- 2025-12: 21.8% late (3,782 orders)
-- 2025-11: 19.9% late (3,443 orders)
-- 2025-08: 13.9% late (2,776 orders)
-- 2026-03: 12.9% late (2,365 orders)
-- 2025-01: 12.5% late (2,338 orders)
-- 2026-01: 12.1% late (2,267 orders)
-- 2025-05: 11.9% late (2,430 orders)
-- 2025-03: 11.8% late (2,279 orders)
-- 2025-07: 11.7% late (2,790 orders)
-- 2026-02: 11.7% late (2,187 orders)
-- 2025-06: 11.5% late (2,183 orders)
-- 2025-10: 11.3% late (2,429 orders)
-- 2026-05: 11.1% late (2,363 orders)
-- 2026-06: 11.1% late (2,371 orders)
-- 2025-09: 10.8% late (2,278 orders)
-- 2025-04: 10.5% late (2,306 orders)
-- 2026-04: 10.4% late (2,339 orders)
-- 2025-02: 9.8% late (2,065 orders)
+## Shipping delays by reason
+- Carrier capacity: 17 delayed shipments, average 2.3 days late
+- High order volume: 11 delayed shipments, average 2.9 days late
+- Equipment downtime: 10 delayed shipments, average 2.8 days late
+- Staffing constraints: 9 delayed shipments, average 2.4 days late
+- Inventory shortage: 7 delayed shipments, average 2.6 days late
 
-## Carrier cutoffs
-- UPSG (UPS Ground, Ground): daily cutoff 17:00, pickup window 30 min
-- FDXG (FedEx Ground, Ground): daily cutoff 16:30, pickup window 30 min
-- USPS (USPS Priority, Priority): daily cutoff 15:00, pickup window 20 min
-- LTLX (Regional LTL Freight, LTL): daily cutoff 14:00, pickup window 60 min
-- UPS2D (UPS 2nd Day Air, Express): daily cutoff 16:00, pickup window 20 min
+## Shipping delay rate by carrier
+- Carrier A: 31.6% delayed (57 shipments)
+- Carrier B: 30.4% delayed (69 shipments)
+- Carrier C: 20.3% delayed (74 shipments)
 
-## Delay prediction model performance
-The XGBoost model was trained on 2025 orders, tuned on January to March 2026, and tested on April to June 2026 (7,073 orders).
-- ROC AUC on test: 0.815
-- Precision recall AUC on test: 0.427
-- Alert threshold: delay probability of 0.28 or higher, which flags about the top 10% riskiest orders (9.5% of test orders flagged)
-- At that threshold, precision is 45.2% (share of flagged orders that really shipped late) and recall is 39.6% (share of late orders that were flagged)
+## Shipping delay rate by month ordered
+- 2026-09: 28.6% delayed (91 shipments)
+- 2026-10: 26.3% delayed (95 shipments)
+- 2026-11: 21.4% delayed (14 shipments)
 
-## Global feature importance (mean absolute SHAP value)
-1. items only in reserve locations (reserve_lines): 0.400
-2. high backlog in its zone (zone_backlog_ratio): 0.295
-3. high backlog in its zone (zone_backlog_units): 0.271
-4. high units per available picker (units_per_picker): 0.230
-5. items spread across several zones (zones_touched): 0.189
-6. few pickers on shift (pickers_on_shift): 0.167
-7. little time to carrier cutoff (hours_to_cutoff): 0.157
-8. day of week (day_of_week): 0.093
-9. peak season volume (is_peak_season): 0.090
-10. zone (dominant_zone): 0.075
-11. many order lines (lines_count): 0.023
-12. large unit count (units): 0.022
-13. few pickers in its zone (zone_pickers_on_shift): 0.021
-14. order value (order_value_usd): 0.017
-15. carrier (carrier_code): 0.014
-16. late release hour (release_hour): 0.006
-17. order channel (order_channel): 0.005
-18. SLA tier (sla_tier): 0.002
-19. order priority (priority): 0.000
+## Inventory status
+100 products, 10 Low Stock (at or below reorder level). Total stock value 1,435,759 USD.
+Low Stock items: PRD0055 (Office Supplies, 16 on hand vs reorder 40, A3-R15), PRD0035 (Home Goods, 5 on hand vs reorder 20, A2-R15), PRD0068 (Apparel, 7 on hand vs reorder 20, A4-R08), PRD0066 (Apparel, 38 on hand vs reorder 50, A4-R06), PRD0076 (Apparel, 31 on hand vs reorder 40, A4-R16), PRD0052 (Office Supplies, 32 on hand vs reorder 40, A3-R12), PRD0004 (Electronics, 16 on hand vs reorder 20, A1-R04), PRD0023 (Home Goods, 28 on hand vs reorder 30, A2-R03), PRD0054 (Office Supplies, 30 on hand vs reorder 30, A3-R14), PRD0071 (Apparel, 30 on hand vs reorder 30, A4-R11).
+
+## Inventory by category
+- Apparel: 20 products, 2,625 units, 4 low stock, 292,421 USD
+- Electronics: 20 products, 2,017 units, 1 low stock, 234,749 USD
+- Hardware: 20 products, 2,643 units, 0 low stock, 279,318 USD
+- Home Goods: 20 products, 2,815 units, 2 low stock, 312,746 USD
+- Office Supplies: 20 products, 2,871 units, 3 low stock, 316,525 USD
+
+## Labor attendance overview
+60 associates (40 pickers, 10 packers, 6 forklift operators, 4 shift leads) over 118 working days. Overall attendance rate 84.7%; 916 absences (including 162 no call no shows), 419 late arrivals, 167 PTO days, 1,770 overtime hours.
+
+## Attendance rate by day of week
+- Monday: 78.7%
+- Saturday: 79.6%
+- Friday: 83.5%
+- Tuesday: 88.3%
+- Thursday: 88.5%
+- Wednesday: 89.5%
+
+## Attendance rate by month
+- 2026-07: 86.4%
+- 2026-08: 85.6%
+- 2026-09: 84.2%
+- 2026-10: 82.8%
+- 2026-11: 84.2%
+
+## Attendance rate by role
+- Forklift Operator: 79.7%
+- Shift Lead: 81.6%
+- Packer: 82.1%
+- Picker: 86.4%
+
+## Attendance rate by employment type
+- Temp: 79.0%
+- Part-time: 85.7%
+- Full-time: 86.3%
+
+## Absence reasons
+- Sick: 398 days
+- Personal: 205 days
+- PTO: 167 days
+- Unexcused: 162 days
+- Transportation: 151 days
+
+## Labor and delays
+- On the expected ship dates of shipments delayed for staffing constraints, attendance averaged 75.9% versus 84.7% overall.
+- On the quarter of days with the fewest pickers present (at most 33 pickers), there were on average 23.3 at-risk orders per day, versus 14.4 on better-staffed days.
+- Mondays have the lowest attendance (78.7%) and the most at-risk orders (696), matching the Monday staffing pattern risk driver.

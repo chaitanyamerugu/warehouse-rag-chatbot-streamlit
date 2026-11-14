@@ -1,0 +1,101 @@
+Product_ID,Product_Name,Category,Stock_Available,Reorder_Level,Warehouse_Location,Unit_Price_USD,Inventory_Status
+PRD0001,Electronics Item 001,Electronics,57,20,A1-R01,164.69,In Stock
+PRD0002,Electronics Item 002,Electronics,125,30,A1-R02,35.86,In Stock
+PRD0003,Electronics Item 003,Electronics,52,20,A1-R03,132.37,In Stock
+PRD0004,Electronics Item 004,Electronics,16,20,A1-R04,26.05,Low Stock
+PRD0005,Electronics Item 005,Electronics,119,20,A1-R05,126.11,In Stock
+PRD0006,Electronics Item 006,Electronics,214,30,A1-R06,102.13,In Stock
+PRD0007,Electronics Item 007,Electronics,142,20,A1-R07,168.38,In Stock
+PRD0008,Electronics Item 008,Electronics,81,50,A1-R08,78.81,In Stock
+PRD0009,Electronics Item 009,Electronics,79,30,A1-R09,210.84,In Stock
+PRD0010,Electronics Item 010,Electronics,172,20,A1-R10,25.85,In Stock
+PRD0011,Electronics Item 011,Electronics,49,40,A1-R11,187.36,In Stock
+PRD0012,Electronics Item 012,Electronics,135,20,A1-R12,162.16,In Stock
+PRD0013,Electronics Item 013,Electronics,63,50,A1-R13,22.86,In Stock
+PRD0014,Electronics Item 014,Electronics,150,40,A1-R14,129.55,In Stock
+PRD0015,Electronics Item 015,Electronics,35,20,A1-R15,147.51,In Stock
+PRD0016,Electronics Item 016,Electronics,148,20,A1-R16,189.04,In Stock
+PRD0017,Electronics Item 017,Electronics,51,50,A1-R17,65.49,In Stock
+PRD0018,Electronics Item 018,Electronics,186,30,A1-R18,85.22,In Stock
+PRD0019,Electronics Item 019,Electronics,107,40,A1-R19,156.19,In Stock
+PRD0020,Electronics Item 020,Electronics,36,30,A1-R20,120.31,In Stock
+PRD0021,Home Goods Item 021,Home Goods,125,30,A2-R01,104.92,In Stock
+PRD0022,Home Goods Item 022,Home Goods,138,30,A2-R02,152.51,In Stock
+PRD0023,Home Goods Item 023,Home Goods,28,30,A2-R03,181.87,Low Stock
+PRD0024,Home Goods Item 024,Home Goods,161,50,A2-R04,63.3,In Stock
+PRD0025,Home Goods Item 025,Home Goods,108,40,A2-R05,51.5,In Stock
+PRD0026,Home Goods Item 026,Home Goods,255,50,A2-R06,195.32,In Stock
+PRD0027,Home Goods Item 027,Home Goods,234,30,A2-R07,62.68,In Stock
+PRD0028,Home Goods Item 028,Home Goods,126,40,A2-R08,165.86,In Stock
+PRD0029,Home Goods Item 029,Home Goods,219,50,A2-R09,83.47,In Stock
+PRD0030,Home Goods Item 030,Home Goods,70,50,A2-R10,25.45,In Stock
+PRD0031,Home Goods Item 031,Home Goods,24,20,A2-R11,38.71,In Stock
+PRD0032,Home Goods Item 032,Home Goods,81,50,A2-R12,133.63,In Stock
+PRD0033,Home Goods Item 033,Home Goods,197,50,A2-R13,133.52,In Stock
+PRD0034,Home Goods Item 034,Home Goods,239,40,A2-R14,213.81,In Stock
+PRD0035,Home Goods Item 035,Home Goods,5,20,A2-R15,151.89,Low Stock
+PRD0036,Home Goods Item 036,Home Goods,136,40,A2-R16,29.87,In Stock
+PRD0037,Home Goods Item 037,Home Goods,222,30,A2-R17,103.1,In Stock
+PRD0038,Home Goods Item 038,Home Goods,134,30,A2-R18,114.64,In Stock
+PRD0039,Home Goods Item 039,Home Goods,54,40,A2-R19,186.12,In Stock
+PRD0040,Home Goods Item 040,Home Goods,259,30,A2-R20,38.71,In Stock
+PRD0041,Office Supplies Item 041,Office Supplies,82,20,A3-R01,134.17,In Stock
+PRD0042,Office Supplies Item 042,Office Supplies,250,20,A3-R02,29.94,In Stock
+PRD0043,Office Supplies Item 043,Office Supplies,185,40,A3-R03,57.24,In Stock
+PRD0044,Office Supplies Item 044,Office Supplies,123,20,A3-R04,24.33,In Stock
+PRD0045,Office Supplies Item 045,Office Supplies,248,20,A3-R05,215.29,In Stock
+PRD0046,Office Supplies Item 046,Office Supplies,64,30,A3-R06,147.19,In Stock
+PRD0047,Office Supplies Item 047,Office Supplies,84,40,A3-R07,118.92,In Stock
+PRD0048,Office Supplies Item 048,Office Supplies,216,30,A3-R08,204.79,In Stock
+PRD0049,Office Supplies Item 049,Office Supplies,102,40,A3-R09,91.38,In Stock
+PRD0050,Office Supplies Item 050,Office Supplies,191,50,A3-R10,198.52,In Stock
+PRD0051,Office Supplies Item 051,Office Supplies,231,20,A3-R11,59.05,In Stock
+PRD0052,Office Supplies Item 052,Office Supplies,32,40,A3-R12,10.5,Low Stock
+PRD0053,Office Supplies Item 053,Office Supplies,117,30,A3-R13,7.54,In Stock
+PRD0054,Office Supplies Item 054,Office Supplies,30,30,A3-R14,20.42,Low Stock
+PRD0055,Office Supplies Item 055,Office Supplies,16,40,A3-R15,21.16,Low Stock
+PRD0056,Office Supplies Item 056,Office Supplies,121,40,A3-R16,149.16,In Stock
+PRD0057,Office Supplies Item 057,Office Supplies,109,30,A3-R17,160.8,In Stock
+PRD0058,Office Supplies Item 058,Office Supplies,242,30,A3-R18,173.91,In Stock
+PRD0059,Office Supplies Item 059,Office Supplies,208,30,A3-R19,26.19,In Stock
+PRD0060,Office Supplies Item 060,Office Supplies,220,40,A3-R20,96.65,In Stock
+PRD0061,Apparel Item 061,Apparel,239,20,A4-R01,150.1,In Stock
+PRD0062,Apparel Item 062,Apparel,50,20,A4-R02,92.16,In Stock
+PRD0063,Apparel Item 063,Apparel,173,20,A4-R03,59.21,In Stock
+PRD0064,Apparel Item 064,Apparel,97,50,A4-R04,36.0,In Stock
+PRD0065,Apparel Item 065,Apparel,93,40,A4-R05,105.0,In Stock
+PRD0066,Apparel Item 066,Apparel,38,50,A4-R06,178.92,Low Stock
+PRD0067,Apparel Item 067,Apparel,50,20,A4-R07,145.56,In Stock
+PRD0068,Apparel Item 068,Apparel,7,20,A4-R08,204.24,Low Stock
+PRD0069,Apparel Item 069,Apparel,121,30,A4-R09,92.97,In Stock
+PRD0070,Apparel Item 070,Apparel,246,30,A4-R10,191.04,In Stock
+PRD0071,Apparel Item 071,Apparel,30,30,A4-R11,87.1,Low Stock
+PRD0072,Apparel Item 072,Apparel,199,40,A4-R12,204.27,In Stock
+PRD0073,Apparel Item 073,Apparel,232,40,A4-R13,96.52,In Stock
+PRD0074,Apparel Item 074,Apparel,249,30,A4-R14,46.64,In Stock
+PRD0075,Apparel Item 075,Apparel,111,20,A4-R15,129.94,In Stock
+PRD0076,Apparel Item 076,Apparel,31,40,A4-R16,18.23,Low Stock
+PRD0077,Apparel Item 077,Apparel,244,30,A4-R17,18.17,In Stock
+PRD0078,Apparel Item 078,Apparel,260,20,A4-R18,188.19,In Stock
+PRD0079,Apparel Item 079,Apparel,35,20,A4-R19,150.5,In Stock
+PRD0080,Apparel Item 080,Apparel,120,50,A4-R20,31.66,In Stock
+PRD0081,Hardware Item 081,Hardware,126,20,A5-R01,138.55,In Stock
+PRD0082,Hardware Item 082,Hardware,214,40,A5-R02,206.03,In Stock
+PRD0083,Hardware Item 083,Hardware,104,40,A5-R03,57.08,In Stock
+PRD0084,Hardware Item 084,Hardware,202,30,A5-R04,149.74,In Stock
+PRD0085,Hardware Item 085,Hardware,153,50,A5-R05,73.66,In Stock
+PRD0086,Hardware Item 086,Hardware,37,20,A5-R06,104.07,In Stock
+PRD0087,Hardware Item 087,Hardware,51,20,A5-R07,121.05,In Stock
+PRD0088,Hardware Item 088,Hardware,259,40,A5-R08,34.35,In Stock
+PRD0089,Hardware Item 089,Hardware,178,20,A5-R09,194.16,In Stock
+PRD0090,Hardware Item 090,Hardware,189,40,A5-R10,39.76,In Stock
+PRD0091,Hardware Item 091,Hardware,154,20,A5-R11,148.92,In Stock
+PRD0092,Hardware Item 092,Hardware,153,20,A5-R12,206.93,In Stock
+PRD0093,Hardware Item 093,Hardware,68,40,A5-R13,30.7,In Stock
+PRD0094,Hardware Item 094,Hardware,54,30,A5-R14,64.28,In Stock
+PRD0095,Hardware Item 095,Hardware,107,40,A5-R15,49.57,In Stock
+PRD0096,Hardware Item 096,Hardware,135,50,A5-R16,59.74,In Stock
+PRD0097,Hardware Item 097,Hardware,26,20,A5-R17,141.74,In Stock
+PRD0098,Hardware Item 098,Hardware,141,20,A5-R18,6.76,In Stock
+PRD0099,Hardware Item 099,Hardware,66,40,A5-R19,40.58,In Stock
+PRD0100,Hardware Item 100,Hardware,226,50,A5-R20,126.03,In Stock

@@ -1,116 +1,112 @@
 """
-Retrieval layer for the Warehouse Management AI Chatbot (RAG).
-Builds TF-IDF indexes over the knowledge documents and scored orders.
+RAG layer: TF-IDF retrieval over the knowledge documents, direct ID lookups, and the
+Claude tool-use loop that answers questions from the warehouse data.
 """
+import json
 import os
 import re
 from pathlib import Path
 
-import numpy as np
-import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 
-BASE = Path(__file__).parent
-MODEL = os.environ.get("CLAUDE_MODEL", "claude-sonnet-5-5")
-TOP_DOCS, TOP_ORDERS = 5, 5
+import data_store as ds
 
-# ------------------------------------------------------------------ knowledge base
-def load_doc_chunks():
-    """Split each markdown file into one chunk per '## ' section."""
-    chunks = []
+BASE = Path(__file__).parent
+TOP_DOCS = 4
+MAX_TOOL_ROUNDS = 6
+
+
+def _chunks():
+    out = []
     for path in sorted((BASE / "knowledge").glob("*.md")):
         text = path.read_text()
         title = text.splitlines()[0].lstrip("# ").strip()
-        parts = re.split(r"\n(?=## )", text)
-        for part in parts:
+        for part in re.split(r"\n(?=## )", text):
             heading = part.splitlines()[0].lstrip("# ").strip()
-            body = part.strip()
-            if len(body) < 40:
+            if len(part.strip()) < 40:
                 continue
-            chunks.append({"source": f"{path.name} > {heading}" if heading != title else path.name,
-                           "text": body if heading == title else f"{title}\n{body}"})
-    return chunks
+            out.append({"source": path.name if heading == title else f"{path.name} > {heading}",
+                        "text": part.strip() if heading == title else f"{title}\n{part.strip()}"})
+    return out
 
 
-orders = pd.read_csv(BASE / "data/scored_orders.csv")
-orders["is_late_text"] = np.where(orders.is_late == 1, "shipped late", "shipped on time")
-
-
-def order_text(r):
-    return (f"Order {r.order_id}: released {r.release_ts} ({r.day_of_week}), carrier {r.carrier_code} cutoff "
-            f"{r.required_ship_by_ts}, {r.hours_to_cutoff} hours to cutoff at release. Customer {r.customer_id}, "
-            f"{r.sla_tier} SLA. {r.lines_count} lines, {r.units} units, {r.zones_touched} zones, main zone "
-            f"{r.dominant_zone}, {r.reserve_lines} lines only in reserve. Zone backlog ratio {r.zone_backlog_ratio}, "
-            f"{r.pickers_on_shift} pickers on shift ({r.zone_pickers_on_shift} in zone {r.dominant_zone}), "
-            f"{r.units_per_picker} units per picker. Delay probability {r.delay_probability:.2f}, risk level "
-            f"{r.risk_level}. Risk drivers: {r.risk_drivers}. Protective factors: {r.protective_factors}. "
-            f"Suggested action: {r.suggested_action}. Outcome: {r.is_late_text} (actual ship {r.actual_ship_ts}).")
-
-
-orders["text"] = [order_text(r) for r in orders.itertuples()]
-order_by_id = dict(zip(orders.order_id, orders.text))
-
-doc_chunks = load_doc_chunks()
-doc_vec = TfidfVectorizer(ngram_range=(1, 2), stop_words="english", sublinear_tf=True)
-doc_matrix = doc_vec.fit_transform([c["text"] for c in doc_chunks])
-ord_vec = TfidfVectorizer(ngram_range=(1, 2), stop_words="english", sublinear_tf=True)
-ord_matrix = ord_vec.fit_transform(orders.text)
-
-RISK_WORDS = re.compile(r"\b(risk|risky|at.risk|flag|flagged|top|highest|urgent|dashboard|priorit|late today|watch)", re.I)
-ORDER_WORDS = re.compile(r"\b(order|orders|SO-)\b", re.I)
+CHUNKS = _chunks()
+_vec = TfidfVectorizer(ngram_range=(1, 2), stop_words="english", sublinear_tf=True)
+_mat = _vec.fit_transform([c["text"] for c in CHUNKS])
+ID_RE = re.compile(r"\b(SO-\d{5}|ORD\d{5}|PRD\d{4}|EMP\d{3})\b", re.I)
+DATE_RE = re.compile(r"\b(2026-\d{2}-\d{2})\b")
 
 
 def retrieve(question):
-    """Return context passages and source labels for a question."""
-    context, sources = [], []
-
-    # 1. exact order lookups
-    ids = sorted(set(m.upper() for m in re.findall(r"SO-\d{5}", question, re.I)))
-    for oid in ids:
-        if oid in order_by_id:
-            context.append(order_by_id[oid]); sources.append(f"scored_orders.csv > {oid}")
-        else:
-            context.append(f"Order {oid} is not in the scored test period (April to June 2026)."); sources.append(f"lookup {oid}")
-
-    # 2. knowledge document sections
-    sims = linear_kernel(doc_vec.transform([question]), doc_matrix).ravel()
+    """Knowledge passages plus direct lookups for any IDs or dates in the question."""
+    ctx = []
+    sims = linear_kernel(_vec.transform([question]), _mat).ravel()
     for i in sims.argsort()[::-1][:TOP_DOCS]:
-        if sims[i] > 0.02:
-            context.append(doc_chunks[i]["text"]); sources.append(doc_chunks[i]["source"])
-
-    # 3. highest-risk list when the user asks about risk or priorities
-    if RISK_WORDS.search(question) and not ids:
-        zone = re.search(r"\bzone\s+([A-D])\b", question, re.I)
-        pool = orders[orders.risk_level == "High"]
-        if zone:
-            pool = pool[pool.dominant_zone == zone.group(1).upper()]
-        top = pool.sort_values("delay_probability", ascending=False).head(10)
-        if len(top):
-            context.append("Highest-risk scored orders" + (f" in zone {zone.group(1).upper()}" if zone else "") + ":\n"
-                           + "\n".join(top.text))
-            sources.append("scored_orders.csv > top high-risk orders")
-
-    # 4. similar order records for descriptive order questions
-    if ORDER_WORDS.search(question) and not ids:
-        osims = linear_kernel(ord_vec.transform([question]), ord_matrix).ravel()
-        for i in osims.argsort()[::-1][:TOP_ORDERS]:
-            if osims[i] > 0.05 and orders.text[i] not in "\n".join(context):
-                context.append(orders.text[i]); sources.append(f"scored_orders.csv > {orders.order_id[i]}")
-    return context, sources
+        if sims[i] > 0.03:
+            ctx.append({"source": CHUNKS[i]["source"], "text": CHUNKS[i]["text"]})
+    for rid in sorted(set(m.upper() for m in ID_RE.findall(question)))[:4]:
+        ctx.append({"source": f"record lookup > {rid}", "text": ds.run_tool("get_record", {"record_id": rid})})
+    for d in sorted(set(DATE_RE.findall(question)))[:2]:
+        ctx.append({"source": f"daily snapshot > {d}", "text": ds.run_tool("daily_snapshot", {"date": d})})
+    return ctx
 
 
-SYSTEM = """You are the Warehouse Operations Assistant for a distribution center. You help shift supervisors \
-understand which customer orders are at risk of missing their carrier cutoff, why, and what to do about it.
+SYSTEM = f"""You are the Warehouse Operations Assistant for a distribution center. You help shift supervisors and \
+managers understand at-risk orders, inventory, shipping delays, and labor attendance, and decide what to do.
 
-Rules:
-- Answer only from the numbered context passages provided with each question. If they do not contain the answer, \
-say you do not have that information and suggest what the user could ask instead.
-- Cite passages inline with their numbers, like [1] or [2][4].
-- For an order, give its delay probability as a percentage, the risk level, the top risk drivers in plain language, \
-and the suggested action. Mention protective factors when relevant.
-- Keep answers short and practical for a busy supervisor: a direct answer first, then bullets if useful.
-- Never invent order IDs, numbers, or policies.
-- Do not use em dashes or en dashes; use commas, colons, or hyphens instead."""
+How to answer:
+- Ground every number in the provided context passages or in results from your data tools. Never estimate or invent \
+order IDs, counts, rates, or dates.
+- The context passages may already answer the question; if they do, answer directly without calling tools.
+- Otherwise call the data tools. Prefer one well-built query_table call with filters, group_by, and metrics over many \
+small calls. For rates use mean of the 0/1 columns (is_delayed, is_present, is_absent, is_late).
+- Dates in the data run from 2026-07-01 to 2026-11-14. Treat "today" as 2026-11-13 for orders and 2026-11-14 for attendance \
+unless the user gives a date.
+- When explaining an at-risk order, give the delay probability as a percentage, its risk drivers in plain words, and the \
+suggested action. Link labor, inventory, or shipping data when it helps explain the situation.
+- Be concise and practical: a direct answer first, then short bullets or a small markdown table if useful.
+- If the data cannot answer the question, say so and suggest a related question it can answer.
+- Do not use em dashes or en dashes; use commas, colons, or hyphens instead.
+
+## Data tables
+{ds.schema_text()}
+"""
 
 
+def get_client():
+    key = os.environ.get("ANTHROPIC_API_KEY")
+    if not key:
+        return None
+    import anthropic
+    return anthropic.Anthropic(api_key=key)
+
+
+def answer(question, history, client, model):
+    """Run retrieval and the tool-use loop. Returns (answer_text, sources, tool_calls)."""
+    ctx = retrieve(question)
+    numbered = "\n\n".join(f"[{i + 1}] {c['source']}\n{c['text']}" for i, c in enumerate(ctx))
+    sources = [c["source"] for c in ctx]
+    tool_log = []
+    if client is None:
+        return ("The language model is not configured yet, so here is what retrieval found:\n\n" + numbered[:3500],
+                sources, tool_log)
+
+    messages = list(history[-6:])
+    messages.append({"role": "user", "content": f"Context passages:\n\n{numbered or '(none)'}\n\nQuestion: {question}"})
+    system = [{"type": "text", "text": SYSTEM, "cache_control": {"type": "ephemeral"}}]
+    for _ in range(MAX_TOOL_ROUNDS):
+        resp = client.messages.create(model=model, max_tokens=1200, system=system, tools=ds.TOOLS, messages=messages)
+        if resp.stop_reason != "tool_use":
+            text = "".join(b.text for b in resp.content if b.type == "text").strip()
+            return text, sources, tool_log
+        messages.append({"role": "assistant", "content": resp.content})
+        results = []
+        for b in resp.content:
+            if b.type == "tool_use":
+                out = ds.run_tool(b.name, b.input)
+                tool_log.append({"tool": b.name, "input": b.input, "output": out})
+                results.append({"type": "tool_result", "tool_use_id": b.id, "content": out[:12000]})
+        messages.append({"role": "user", "content": results})
+    return ("I could not finish the analysis within the query limit. Try a narrower question, for example one month, "
+            "one zone, or one carrier.", sources, tool_log)
